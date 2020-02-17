@@ -30,6 +30,24 @@ router.get('/:id', (req, res) => {
     })
 })
 
+// post new account
+// name and budget
+// error even if successful???
+router.post('/', (req, res) => {
+  const accountDetails = req.body;
+
+  db('accounts')
+    .insert(accountDetails, 'id')
+    .then(ids => {
+      return getById(ids[0])
+      .then(inserted => {
+        res.status(201).json(inserted);
+      })
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: 'Error posting a new account', error })
+    })
+})
 
 
 module.exports = router;
