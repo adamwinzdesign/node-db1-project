@@ -18,9 +18,11 @@ router.get('/', (req, res) => {
 
 // get account by id
 router.get('/:id', (req, res) => {
+  const id = req.params.id;
+
   db.select('*')
     .from('accounts')
-    .where({ id: req.params.id })
+    .where({ id })
     .first()
     .then(account => {
       res.status(200).json(account)
@@ -32,15 +34,19 @@ router.get('/:id', (req, res) => {
 
 // post new account
 // name and budget
-// error even if successful???
 router.post('/', (req, res) => {
   const accountDetails = req.body;
 
   db('accounts')
     .insert(accountDetails, 'id')
     .then(ids => {
-      return getById(ids[0])
-      .then(inserted => {
+      // return getById(ids[0])
+      const id = id[0];
+      
+      return db('accounts')
+        .where({ id })
+        .first()
+        .then(inserted => {
         res.status(201).json(inserted);
       })
     })
@@ -49,5 +55,41 @@ router.post('/', (req, res) => {
     })
 })
 
+// edit account 
+router.put('/:id', (req, res) => {
+  const id = req.params.id;
+  const changes = req.body;
+  
+  db('accounts')
+    .where({ id }) 
+    .update(changes)
+    .then(count => {
+      res.status(200).json(count);
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: 'Error updating the account info', error })
+    })
+});
+
+// delete account
+router.delete('/:id', (req, res) => {
+  const id = req.params.id;
+
+  db('accounts')
+    .where({ id })
+    .del()
+    .then(count => {
+      res.status(200).json(count);
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: 'Error deleting that account', error })
+    })
+})
+
+// function getById(id) {
+//   return db('accounts')
+//     .where({ id })
+//     .first();
+// }
 
 module.exports = router;
