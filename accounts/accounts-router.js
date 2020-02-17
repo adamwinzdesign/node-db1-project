@@ -41,8 +41,8 @@ router.post('/', (req, res) => {
     .insert(accountDetails, 'id')
     .then(ids => {
       // return getById(ids[0])
-      const id = id[0];
-      
+      const id = ids[0];
+
       return db('accounts')
         .where({ id })
         .first()
